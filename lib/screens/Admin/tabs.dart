@@ -1,9 +1,11 @@
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/tester.dart';
 import 'package:discipline_committee/mywidgets/button.dart';
 import 'package:discipline_committee/screens/Admin/NewReport.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../Global/Widgets/textField_widget.dart';
 
 class Admintab extends StatefulWidget {
   const Admintab({super.key});
@@ -21,6 +23,7 @@ class ItemLists {
 }
 
 class _AdmintabState extends State<Admintab> {
+  TextEditingController text = TextEditingController();
   List<ItemLists> previtems = [
     ItemLists(
       user: "Ali Ashraf",

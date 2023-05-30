@@ -1,5 +1,7 @@
 import 'package:discipline_committee/Global/Navigation/Navigater.dart';
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/Widgets/SnackBar_widget.dart';
+import 'package:discipline_committee/Global/constant.dart';
+import 'package:discipline_committee/Models/UserApi.dart';
 import 'package:discipline_committee/screens/Admin/admin.dart';
 import 'package:discipline_committee/mywidgets/button.dart';
 import 'package:discipline_committee/mywidgets/inputtextbox.dart';
@@ -13,8 +15,8 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController txt = TextEditingController();
-    TextEditingController txt1 = TextEditingController();
+    TextEditingController Username = TextEditingController();
+    TextEditingController Password = TextEditingController();
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -63,7 +65,7 @@ class LoginScreen extends StatelessWidget {
                   keytype: TextInputType.text,
                   hintText: "Enter Your UserName ",
                   siconn: Icons.person,
-                  controller: txt,
+                  controller: Username,
                   validator: null,
                   label: "UserName",
                 ),
@@ -75,7 +77,7 @@ class LoginScreen extends StatelessWidget {
                   siconn: Icons.password_outlined,
                   label: "Password",
                   hintText: "Enter Password",
-                  controller: txt1,
+                  controller: Password,
                   validator: null,
                 ),
                 SizedBox(
@@ -85,11 +87,11 @@ class LoginScreen extends StatelessWidget {
                   child: ButtonWidget(
                     btnText: "Login",
                     onPress: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const Navigater(),
-                        ),
-                      );
+                      if (Username.text != "" && Password.text != "") {
+                        login(Username.text, Password.text, context);
+                      } else {
+                        snackBar(context, "Please Enter Username & Password");
+                      }
                     },
                   ),
                 )

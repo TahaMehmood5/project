@@ -1,6 +1,6 @@
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 
-import 'constant.dart';
+import '../constant.dart';
 import 'package:flutter/material.dart';
 
 getDialogue(context) {

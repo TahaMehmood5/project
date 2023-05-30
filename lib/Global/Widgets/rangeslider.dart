@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'constant.dart';
+import '../constant.dart';
 
 class RangeSlidr extends StatefulWidget {
   const RangeSlidr({Key? key}) : super(key: key);

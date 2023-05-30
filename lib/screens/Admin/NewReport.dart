@@ -1,15 +1,19 @@
+// import 'dart:js';
+
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
+import 'package:discipline_committee/Global/Widgets/SnackBar_widget.dart';
 import 'package:discipline_committee/Global/Widgets/button_widget.dart';
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/textField_widget.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/Widgets/txtfield_Round.dart';
-import 'package:discipline_committee/screens/Committe_Member/dashboard.dart';
+import 'package:discipline_committee/screens/Committe_Member/Committee_Dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:intl/intl.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:dio/dio.dart';
 
 import '../Committe_Member/Report_View.dart';
 
@@ -24,15 +28,42 @@ class NewReport_Screen extends StatefulWidget {
 String dropdownvalue = 'Smoking';
 
 // List of items in our dropdown menu
-var items = [
-  'Smoking',
-  'Harassment',
-  'Fighting',
-  'Misbehave with Teacher',
-  'Lab Damage',
-];
 
 class _NewReport_ScreenState extends State<NewReport_Screen> {
+  @override
+  void initState() {
+    super.initState();
+    getCommittees();
+  }
+
+  List<String> committeeTitles = [];
+  String? selectedCommittee;
+
+  Future<void> getCommittees() async {
+    try {
+      var response = await Dio().get('$api/Getcommetiee');
+
+      if (response.statusCode == 200) {
+        if (response.data != 'false') {
+          List<Map<String, dynamic>> committees =
+              List<Map<String, dynamic>>.from(response.data);
+
+          setState(() {
+            committeeTitles = committees
+                .map((committee) => committee["title"].toString())
+                .toList();
+          });
+        } else {
+          // Handle API error or empty response
+        }
+      } else {
+        // Handle API error
+      }
+    } catch (error) {
+      // Handle network or other errors
+    }
+  }
+
   TextEditingController test = TextEditingController();
   TextEditingController test1 = TextEditingController();
   TextEditingController test2 = TextEditingController();
@@ -156,8 +187,9 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                           color: Color.fromARGB(255, 248, 245, 234),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(
-                              "assets/images.png",
+                            child: ButtonWidget(
+                              btnText: "Pick Image",
+                              onPress: () {},
                             ),
                           ),
                         ),
@@ -174,28 +206,21 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                         SizedBox(
                           width: 60,
                         ),
-                        DropdownButton(
-                          // Initial Value
+                        DropdownButton<String>(
                           value: dropdownvalue,
-
-                          // Down Arrow Icon
                           icon: const Icon(Icons.keyboard_arrow_down),
-
-                          // Array list of items
-                          items: items.map((String items) {
-                            return DropdownMenuItem(
-                              value: items,
-                              child: Text(items),
+                          items: committeeTitles.map((String item) {
+                            return DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(item),
                             );
                           }).toList(),
-                          // After selecting the desired option,it will
-                          // change button value to selected value
                           onChanged: (String? newValue) {
                             setState(() {
                               dropdownvalue = newValue!;
                             });
                           },
-                        ),
+                        )
                       ],
                     ),
                     SizedBox(
@@ -264,7 +289,7 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                           onPress: () {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
-                                    const CommitteeDashoard_Screen()));
+                                    const CommitteeDashboard_Screen()));
                           }),
                     )
                   ],

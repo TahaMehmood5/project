@@ -1,4 +1,4 @@
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/screens/Admin/tabs.dart';
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,4 @@
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/tester.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/Widgets/textfield_Round_readonly.dart';
@@ -25,7 +25,7 @@ class ReportView_Screen extends StatefulWidget {
 String dropdownvalue = 'Faculty 2';
 
 // List of items in our dropdown menu
-var items = [
+var _items = [
   'Faculty 2',
   'LT-4',
   'Lab 4',
@@ -353,7 +353,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
                     icon: const Icon(Icons.keyboard_arrow_down),
 
                     // Array list of items
-                    items: items.map((String items) {
+                    items: _items.map((String items) {
                       return DropdownMenuItem(
                         value: items,
                         child: Text(items),

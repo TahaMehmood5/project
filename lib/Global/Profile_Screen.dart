@@ -1,4 +1,4 @@
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/screens/Admin/NewReport.dart';
 import 'package:discipline_committee/screens/HOC/Add_Committee.dart';
@@ -67,7 +67,7 @@ class _Profile_ScreenState extends State<Profile_Screen> {
               backgroundMotifColor: Colors.white,
               settingColor: Colors.amber,
               //userName: loggedInUser!.name,
-              userName: "Dr Naseer Ahmad Sajid",
+              userName: "${loggedInUser!.name}",
               userProfilePic: AssetImage("assets/images.png"),
               // userProfilePic: NetworkImage(
               //   "",
@@ -101,7 +101,7 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                     ),
                     onPressed: (() {}),
                     child: Text(
-                      "Committee Member",
+                      "${loggedInUser!.usertype}",
                       // loggedInUser!.role,
                       style: GoogleFonts.gemunuLibre(
                         fontWeight: FontWeight.w900,
@@ -139,55 +139,46 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                 title: 'Change Password',
                 subtitle: "Change Previous Password",
               ),
-              SettingsItem(
-                backgroundColor: btnColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NewReport_Screen(),
+              loggedInUser!.usertype != "std"
+                  ? SettingsItem(
+                      backgroundColor: btnColor,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NewReport_Screen(),
+                          ),
+                        );
+                      },
+                      icons: Icons.admin_panel_settings_rounded,
+                      iconStyle: IconStyle(
+                        iconsColor: Colors.white,
+                        withBackground: true,
+                        backgroundColor: Colors.red,
+                      ),
+                      title: 'New Case',
+                      subtitle: "Add New Case Against Student",
+                    )
+                  : SettingsItem(
+                      backgroundColor: btnColor,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NewReport_Screen(),
+                          ),
+                        );
+                      },
+                      icons: Icons.admin_panel_settings_rounded,
+                      iconStyle: IconStyle(
+                        iconsColor: Colors.white,
+                        withBackground: true,
+                        backgroundColor: Colors.red,
+                      ),
+                      title: 'Fine History',
+                      subtitle: "Check Previous Fine Record",
                     ),
-                  );
-                },
-                icons: Icons.admin_panel_settings_rounded,
-                iconStyle: IconStyle(
-                  iconsColor: Colors.white,
-                  withBackground: true,
-                  backgroundColor: Colors.red,
-                ),
-                title: 'New Case',
-                subtitle: "Add New Case Against Student",
-              ),
-              // SettingsItem(
-              //   onTap: () {},
-              //   icons: _hasDengue
-              //       ? Icons.sentiment_very_dissatisfied
-              //       : Icons.emoji_emotions_outlined,
-              //   iconStyle: IconStyle(
-              //     iconsColor: Colors.white,
-              //     withBackground: true,
-              //     backgroundColor: Colors.red,
-              //   ),
-              //   title: 'Status',
-              //   subtitle: "Do you have Dengue?",
-              //   trailing: Switch.adaptive(
-              //     inactiveTrackColor:
-              //         const Color.fromARGB(255, 255, 255, 255),
-              //     inactiveThumbColor:
-              //         const Color.fromARGB(255, 246, 195, 195),
-              //     //enableFeedback: true,
-              //     activeColor: btnColor,
-              //     value: _hasDengue,
-              //     onChanged: (value) {
-              //       setState(
-              //         () {
-              //           _hasDengue = value;
-              //           _DengueStatussetting(value);
-              //         },
-              //       );
-              //     },
-              //   ),
-              // ),
+
               SettingsItem(
                 onTap: () {
                   // Navigator.of(context).push(

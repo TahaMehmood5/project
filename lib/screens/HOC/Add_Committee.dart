@@ -1,4 +1,4 @@
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/tester.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/Widgets/txtfield_Round.dart';

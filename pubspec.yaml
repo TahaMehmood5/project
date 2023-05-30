@@ -47,6 +47,8 @@ dependencies:
   flutter_custom_selector: ^0.0.3
   flutter_heatmap_calendar: ^1.0.5
   draggable_menu: ^1.1.0
+  dio: ^5.1.2
+  pluto_grid: ^6.0.4
 
 dev_dependencies:
   flutter_test:

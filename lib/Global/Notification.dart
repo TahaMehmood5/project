@@ -1,5 +1,5 @@
 import 'package:discipline_committee/Global/NotificationModel/Notification_Model.dart';
-import 'package:discipline_committee/Global/Widgets/constant.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:flutter/material.dart';
 
 class Notification_Screen extends StatefulWidget {
