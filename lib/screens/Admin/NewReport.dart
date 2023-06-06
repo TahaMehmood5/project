@@ -1,5 +1,7 @@
 // import 'dart:js';
 
+import 'dart:convert';
+
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:discipline_committee/Global/Widgets/SnackBar_widget.dart';
 import 'package:discipline_committee/Global/Widgets/button_widget.dart';
@@ -7,6 +9,8 @@ import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/textField_widget.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/Widgets/txtfield_Round.dart';
+import 'package:discipline_committee/Models/ReportApi.dart';
+import 'package:discipline_committee/mywidgets/dropdown_search.dart';
 import 'package:discipline_committee/screens/Committe_Member/Committee_Dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -15,7 +19,12 @@ import 'package:intl/intl.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:dio/dio.dart';
 
+import '../../Global/Widgets/textfield_Round_readonly.dart';
 import '../Committe_Member/Report_View.dart';
+
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_custom_selector/flutter_custom_selector.dart' as sector;
 
 class NewReport_Screen extends StatefulWidget {
   const NewReport_Screen({super.key});
@@ -26,7 +35,7 @@ class NewReport_Screen extends StatefulWidget {
 
 // Initial Selected Value
 String dropdownvalue = 'Smoking';
-
+String? filter = "fm";
 // List of items in our dropdown menu
 
 class _NewReport_ScreenState extends State<NewReport_Screen> {
@@ -64,7 +73,61 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
     }
   }
 
-  TextEditingController test = TextEditingController();
+  List<String>? users;
+  Map<String, int>? usersIds;
+  int? selectedUserId;
+
+  Future<Map<String, int>> fetchUsersWithIds(String? usertype) async {
+    final response =
+        await http.get(Uri.parse('$api/GetReportedBy?usertype=$usertype'));
+
+    if (response.statusCode == 200) {
+      final officersJson = jsonDecode(response.body) as List<dynamic>;
+      final officers = officersJson.fold<Map<String, int>>({}, (map, officer) {
+        final name = officer['name'];
+        final userId = officer['u_id'];
+        if (name != null && userId != null) {
+          return map..[name] = userId;
+        } else {
+          return map;
+        }
+      });
+
+      return officers;
+    } else {
+      throw Exception('Failed to fetch users');
+    }
+  }
+
+//
+//
+//
+  List<String>? stds;
+  Map<String, int>? stdsIds;
+  int? selectedstdId;
+  Future<Map<String, int>> fetchstdsWithIds(String? usertype) async {
+    final response =
+        await http.get(Uri.parse('$api/GetReportedBy?usertype=$usertype'));
+
+    if (response.statusCode == 200) {
+      final officersJson = jsonDecode(response.body) as List<dynamic>;
+      final officers = officersJson.fold<Map<String, int>>({}, (map, officer) {
+        final name = officer['username'];
+        final userId = officer['u_id'];
+        if (name != null && userId != null) {
+          return map..[name] = userId;
+        } else {
+          return map;
+        }
+      });
+
+      return officers;
+    } else {
+      throw Exception('Failed to fetch officers');
+    }
+  }
+
+  TextEditingController test3 = TextEditingController();
   TextEditingController test1 = TextEditingController();
   TextEditingController test2 = TextEditingController();
   @override
@@ -97,11 +160,13 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                       leading: Radio(
                         fillColor: MaterialStateColor.resolveWith(
                             (states) => Color.fromARGB(255, 93, 63, 143)),
-                        value: test,
-                        groupValue: test,
+                        value: 'fm',
+                        groupValue: filter,
                         onChanged: (value) {
                           setState(() {
-                            value;
+                            users!.clear();
+                            filter = value;
+                            fetchUsersWithIds(filter);
                           });
                         },
                       ),
@@ -112,11 +177,14 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                       leading: Radio(
                         fillColor: MaterialStateColor.resolveWith(
                             (states) => Color.fromARGB(255, 90, 52, 126)),
-                        value: null,
-                        groupValue: test,
+                        value: 'nfm',
+                        groupValue: filter,
                         onChanged: (value) {
                           setState(() {
-                            value;
+                            users!.clear();
+                            filter = value;
+
+                            fetchUsersWithIds(filter);
                           });
                         },
                       ),
@@ -127,35 +195,89 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                       leading: Radio(
                         fillColor: MaterialStateColor.resolveWith(
                             (states) => btnColor),
-                        value: null,
-                        groupValue: test,
+                        value: 'std',
+                        groupValue: filter,
                         onChanged: (value) {
                           setState(() {
-                            value;
+                            users!.clear();
+                            filter = value;
+                            fetchUsersWithIds(filter);
                           });
                         },
                       ),
                     ),
-                    InputTxtField(
-                      label: "search user",
-                      siconn: Icons.search,
-                      hintText: "Search",
-                      controller: test,
-                      validator: null,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: FutureBuilder<Map<String, int>>(
+                        future: fetchUsersWithIds(filter),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            usersIds = snapshot.data;
+                            users = usersIds!.keys.toList();
+                            return sector.CustomSingleSelectField<String>(
+                              title: '$filter',
+                              items: users!,
+                              onSelectionDone: (value) {
+                                final selectedOfficerId =
+                                    usersIds![value as String];
+                                setState(() {
+                                  this.selectedUserId = selectedOfficerId;
+                                });
+                              },
+                              itemAsString: (item) => item.toString(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Text('Error fetching officers data');
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                      ),
                     ),
                     SizedBox(
                       height: 10,
                     ),
-                    InputTxtField(
-                      label: "Reported Student",
-                      siconn: Icons.search,
-                      hintText: "Search",
-                      controller: test1,
-                      validator: null,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: FutureBuilder<Map<String, int>>(
+                        future: fetchstdsWithIds("std"),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            stdsIds = snapshot.data;
+                            stds = stdsIds!.keys.toList();
+                            return sector.CustomSingleSelectField<String>(
+                              title: 'Repoted Student',
+                              items: stds!,
+                              onSelectionDone: (value) {
+                                final selectedOfficerId =
+                                    stdsIds![value as String];
+                                setState(() {
+                                  this.selectedstdId = selectedOfficerId;
+                                });
+                              },
+                              itemAsString: (item) => item.toString(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Text('Error fetching officers data');
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                      ),
                     ),
                     SizedBox(
                       height: 10,
                     ),
+                    // InputTxtField(
+                    //   label: "Reported Student",
+                    //   siconn: Icons.search,
+                    //   hintText: "Search",
+                    //   controller: test1,
+                    //   validator: null,
+                    // ),
+                    // SizedBox(
+                    //   height: 10,
+                    // ),
                     TextWidget(
                       title: "Description",
                       txtSize: 18,

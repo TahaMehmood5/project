@@ -16,17 +16,6 @@ class _AdminscreenState extends State<Adminscreen> {
       appBar: AppBar(
         backgroundColor: ScfColor,
         title: Text('Admin Dashboard'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_active,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              // do something
-            },
-          )
-        ],
       ),
       body: SingleChildScrollView(
         child: Container(

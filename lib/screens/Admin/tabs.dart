@@ -48,7 +48,7 @@ class _AdmintabState extends State<Admintab> {
     ItemLists(
       user: "M.Huzaifa",
       aridno: '2019-arid-3001',
-      violation: 'Misbave With Teacher',
+      violation: 'Misbehave With Teacher',
     ),
   ];
   @override

@@ -12,7 +12,7 @@ Color greenColor = Colors.green.shade200;
 
 User? loggedInUser;
 
-String ip = "192.168.43.73";
+String ip = "192.168.10.55";
 String api = 'http://$ip/ProjectAPI/api/server';
 String imgpath = 'http://$ip/appapisection2/Content/Uploads/';
 
