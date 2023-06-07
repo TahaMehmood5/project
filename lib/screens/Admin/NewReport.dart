@@ -1,6 +1,7 @@
 // import 'dart:js';
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:discipline_committee/Global/Widgets/SnackBar_widget.dart';
@@ -15,6 +16,7 @@ import 'package:discipline_committee/screens/Committe_Member/Committee_Dashboard
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:dio/dio.dart';
@@ -25,6 +27,7 @@ import '../Committe_Member/Report_View.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_custom_selector/flutter_custom_selector.dart' as sector;
+export 'package:image_picker/image_picker.dart';
 
 class NewReport_Screen extends StatefulWidget {
   const NewReport_Screen({super.key});
@@ -45,8 +48,32 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
     getCommittees();
   }
 
+  List<String>? comity;
+  Map<String, int>? comityIds;
+  int? selectedcomityId;
+
+  Future<Map<String, int>> getCommitteesWithIds() async {
+    final response = await http.get(Uri.parse('$api/Getcommetiee'));
+
+    if (response.statusCode == 200) {
+      final officersJson = jsonDecode(response.body) as List<dynamic>;
+      final officers = officersJson.fold<Map<String, int>>({}, (map, officer) {
+        final name = officer['name'];
+        final userId = officer['u_id'];
+        if (name != null && userId != null) {
+          return map..[name] = userId;
+        } else {
+          return map;
+        }
+      });
+
+      return officers;
+    } else {
+      throw Exception('Failed to fetch users');
+    }
+  }
+
   List<String> committeeTitles = [];
-  String? selectedCommittee;
 
   Future<void> getCommittees() async {
     try {
@@ -126,6 +153,9 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
       throw Exception('Failed to fetch officers');
     }
   }
+
+  User? u;
+  File? imageFile;
 
   TextEditingController test3 = TextEditingController();
   TextEditingController test1 = TextEditingController();
@@ -311,39 +341,48 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                             padding: const EdgeInsets.all(8.0),
                             child: ButtonWidget(
                               btnText: "Pick Image",
-                              onPress: () {},
+                              onPress: () async {
+                                XFile? file = await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
+                                if (file != null) {
+                                  imageFile = File(file.path);
+                                  loggedInUser!.uploadPic(imageFile!);
+                                }
+                                Navigator.of(context).pop();
+                                setState(() {});
+                              },
                             ),
                           ),
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        TextWidget(
-                          title: "Select Category",
-                          txtSize: 15,
-                          txtColor: txtColor,
-                        ),
-                        SizedBox(
-                          width: 60,
-                        ),
-                        DropdownButton<String>(
-                          value: dropdownvalue,
-                          icon: const Icon(Icons.keyboard_arrow_down),
-                          items: committeeTitles.map((String item) {
-                            return DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: FutureBuilder<Map<String, int>>(
+                        future: getCommitteesWithIds(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            comityIds = snapshot.data;
+                            comity = comityIds!.keys.toList();
+                            return sector.CustomSingleSelectField<String>(
+                              title: 'Select Category',
+                              items: comity!,
+                              onSelectionDone: (value) {
+                                final selectedOfficerId =
+                                    comityIds![value as String];
+                                setState(() {
+                                  this.selectedcomityId = selectedOfficerId;
+                                });
+                              },
+                              itemAsString: (item) => item.toString(),
                             );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropdownvalue = newValue!;
-                            });
-                          },
-                        )
-                      ],
+                          } else if (snapshot.hasError) {
+                            return const Text('Error fetching officers data');
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                      ),
                     ),
                     SizedBox(
                       height: 10,
