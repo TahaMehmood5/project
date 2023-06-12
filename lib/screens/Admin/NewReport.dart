@@ -10,6 +10,7 @@ import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/textField_widget.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/Widgets/txtfield_Round.dart';
+import 'package:discipline_committee/Models/AssignPunishmentApi.dart';
 import 'package:discipline_committee/Models/ReportApi.dart';
 import 'package:discipline_committee/mywidgets/dropdown_search.dart';
 import 'package:discipline_committee/screens/Committe_Member/Committee_Dashboard.dart';
@@ -20,8 +21,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
+import 'package:select2dot1/select2dot1.dart';
 
+import '../../Global/Navigation/Navigater.dart';
 import '../../Global/Widgets/textfield_Round_readonly.dart';
+import '../../Models/usermodel.dart';
+import '../../mywidgets/DropDownController.dart';
+import '../../mywidgets/dropdown_controller.dart';
 import '../Committe_Member/Report_View.dart';
 
 import 'package:dropdown_search/dropdown_search.dart';
@@ -37,7 +44,6 @@ class NewReport_Screen extends StatefulWidget {
 }
 
 // Initial Selected Value
-String dropdownvalue = 'Smoking';
 String? filter = "fm";
 // List of items in our dropdown menu
 
@@ -45,12 +51,14 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
   @override
   void initState() {
     super.initState();
-    getCommittees();
+    // getCommittees();
   }
 
   List<String>? comity;
   Map<String, int>? comityIds;
   int? selectedcomityId;
+
+  DropDownController? dropDownController;
 
   Future<Map<String, int>> getCommitteesWithIds() async {
     final response = await http.get(Uri.parse('$api/Getcommetiee'));
@@ -58,8 +66,8 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
     if (response.statusCode == 200) {
       final officersJson = jsonDecode(response.body) as List<dynamic>;
       final officers = officersJson.fold<Map<String, int>>({}, (map, officer) {
-        final name = officer['name'];
-        final userId = officer['u_id'];
+        final name = officer['title'];
+        final userId = officer['com_id'];
         if (name != null && userId != null) {
           return map..[name] = userId;
         } else {
@@ -73,54 +81,72 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
     }
   }
 
-  List<String> committeeTitles = [];
+  // List<String> committeeTitles = [];
 
-  Future<void> getCommittees() async {
-    try {
-      var response = await Dio().get('$api/Getcommetiee');
+  // Future<void> getCommittees() async {
+  //   try {
+  //     var response = await Dio().get('$api/Getcommetiee');
 
-      if (response.statusCode == 200) {
-        if (response.data != 'false') {
-          List<Map<String, dynamic>> committees =
-              List<Map<String, dynamic>>.from(response.data);
+  //     if (response.statusCode == 200) {
+  //       if (response.data != 'false') {
+  //         List<Map<String, dynamic>> committees =
+  //             List<Map<String, dynamic>>.from(response.data);
 
-          setState(() {
-            committeeTitles = committees
-                .map((committee) => committee["title"].toString())
-                .toList();
-          });
-        } else {
-          // Handle API error or empty response
-        }
-      } else {
-        // Handle API error
-      }
-    } catch (error) {
-      // Handle network or other errors
-    }
-  }
+  //         setState(() {
+  //           committeeTitles = committees
+  //               .map((committee) => committee["title"].toString())
+  //               .toList();
+  //         });
+  //       } else {
+  //         // Handle API error or empty response
+  //       }
+  //     } else {
+  //       // Handle API error
+  //     }
+  //   } catch (error) {
+  //     // Handle network or other errors
+  //   }
+  // }
 
   List<String>? users;
   Map<String, int>? usersIds;
   int? selectedUserId;
-
-  Future<Map<String, int>> fetchUsersWithIds(String? usertype) async {
+  SingleCategoryModel? stdsCategory; // Initialize stdsCategory
+  SingleCategoryModel? userCategory;
+  fetchUsersWithIds(String? usertype) async {
     final response =
         await http.get(Uri.parse('$api/GetReportedBy?usertype=$usertype'));
 
     if (response.statusCode == 200) {
       final officersJson = jsonDecode(response.body) as List<dynamic>;
-      final officers = officersJson.fold<Map<String, int>>({}, (map, officer) {
-        final name = officer['name'];
-        final userId = officer['u_id'];
-        if (name != null && userId != null) {
-          return map..[name] = userId;
-        } else {
-          return map;
-        }
-      });
 
-      return officers;
+      userCategory = SingleCategoryModel(
+        nameCategory: usertype == 'fm'
+            ? 'Faculty Mem'
+            : usertype == 'nfm'
+                ? 'Non faculty'
+                : 'Student',
+        singleItemCategoryList: officersJson
+            .map((e) => SingleItemCategoryModel(
+                  value: e['u_id'].toString(),
+                  extraInfoSingleItem: e['name'],
+                  nameSingleItem: e['name'],
+                ))
+            .toList(),
+      );
+
+      // Map<String, int> usersWithIds = {};
+      // category.singleItemCategoryList.forEach((item) {
+      //   final name = item.nameSingleItem;
+      //   final value = item.value;
+      //   if (name != null && value != null) {
+      //     usersWithIds[name] = int.parse(value);
+      //   }
+      // });
+
+//      stdsCategory = category; // Assign the value to stdsCategory
+
+      return stdsCategory == null ? null : stdsCategory!;
     } else {
       throw Exception('Failed to fetch users');
     }
@@ -130,38 +156,55 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
 //
 //
   List<String>? stds;
-  Map<String, int>? stdsIds;
+
   int? selectedstdId;
-  Future<Map<String, int>> fetchstdsWithIds(String? usertype) async {
+  fetchstdsWithIds(String? usertype) async {
     final response =
         await http.get(Uri.parse('$api/GetReportedBy?usertype=$usertype'));
 
     if (response.statusCode == 200) {
       final officersJson = jsonDecode(response.body) as List<dynamic>;
-      final officers = officersJson.fold<Map<String, int>>({}, (map, officer) {
-        final name = officer['username'];
-        final userId = officer['u_id'];
-        if (name != null && userId != null) {
-          return map..[name] = userId;
-        } else {
-          return map;
-        }
-      });
 
-      return officers;
+      stdsCategory = SingleCategoryModel(
+        nameCategory: usertype == 'fm'
+            ? 'Faculty Mem'
+            : usertype == 'nfm'
+                ? 'Non faculty'
+                : 'Student',
+        singleItemCategoryList: officersJson
+            .map((e) => SingleItemCategoryModel(
+                  value: e['u_id'].toString(),
+                  extraInfoSingleItem: e['name'],
+                  nameSingleItem: e['username'],
+                ))
+            .toList(),
+      );
+
+      // Map<String, int> usersWithIds = {};
+      // category.singleItemCategoryList.forEach((item) {
+      //   final name = item.nameSingleItem;
+      //   final value = item.value;
+      //   if (name != null && value != null) {
+      //     usersWithIds[name] = int.parse(value);
+      //   }
+      // });
+
+//      stdsCategory = category; // Assign the value to stdsCategory
+
+      return stdsCategory == null ? null : stdsCategory!;
     } else {
       throw Exception('Failed to fetch officers');
     }
   }
 
-  User? u;
   File? imageFile;
 
   TextEditingController test3 = TextEditingController();
   TextEditingController test1 = TextEditingController();
-  TextEditingController test2 = TextEditingController();
+  TextEditingController des_con = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    dropDownController = context.read<DropDownController>();
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -193,10 +236,9 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                         value: 'fm',
                         groupValue: filter,
                         onChanged: (value) {
+                          filter = value;
                           setState(() {
-                            users!.clear();
-                            filter = value;
-                            fetchUsersWithIds(filter);
+                            // fetchUsersWithIds(filter);
                           });
                         },
                       ),
@@ -210,11 +252,9 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                         value: 'nfm',
                         groupValue: filter,
                         onChanged: (value) {
+                          filter = value;
                           setState(() {
-                            users!.clear();
-                            filter = value;
-
-                            fetchUsersWithIds(filter);
+                            // fetchUsersWithIds(filter);
                           });
                         },
                       ),
@@ -228,64 +268,128 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                         value: 'std',
                         groupValue: filter,
                         onChanged: (value) {
+                          filter = value;
                           setState(() {
-                            users!.clear();
-                            filter = value;
-                            fetchUsersWithIds(filter);
+                            // fetchUsersWithIds(filter);
                           });
                         },
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: FutureBuilder<Map<String, int>>(
+                      child: FutureBuilder(
                         future: fetchUsersWithIds(filter),
                         builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            usersIds = snapshot.data;
-                            users = usersIds!.keys.toList();
-                            return sector.CustomSingleSelectField<String>(
-                              title: '$filter',
-                              items: users!,
-                              onSelectionDone: (value) {
-                                final selectedOfficerId =
-                                    usersIds![value as String];
-                                setState(() {
-                                  this.selectedUserId = selectedOfficerId;
-                                });
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasData) {
+                            // usersIds = snapshot.data;
+                            // users = usersIds!.keys.toList();
+
+                            return GestureDetector(
+                              onTap: () async {
+                                // final selectedUser = await showDialog<String>(
+                                //   // Show a dialog or dropdown to select the user
+                                //   context: context,
+                                //   builder: (context) => AlertDialog(
+                                //     title: Text('Select User'),
+                                //     content: Container(
+                                //       width: double.maxFinite,
+                                //       child: ListView.builder(
+                                //         shrinkWrap: true,
+                                //         itemCount: users!.length,
+                                //         itemBuilder: (context, index) {
+                                //           final user = users![index];
+                                //           return ListTile(
+                                //             title: Text(user),
+                                //             onTap: () {
+                                //               Navigator.pop(context,
+                                //                   user); // Pass the selected user back to the onTap callback
+                                //             },
+                                //           );
+                                //         },
+                                //       ),
+                                //     ),
+                                //   ),
+                                // );
+
+                                // if (selectedUser != null) {
+                                //   setState(() {
+                                //     selectedUserId = usersIds![selectedUser];
+                                //   });
+                                // }
                               },
-                              itemAsString: (item) => item.toString(),
+                              child: CustomSelect2dot1(
+                                avatarInSingleSelect: true,
+                                extraInfoInDropdown: false,
+                                isReortedby: true,
+                                extraInfoInSingleSelect: false,
+                                title: 'Select',
+                                scrollController: ScrollController(),
+                                data:
+                                    userCategory != null ? [userCategory!] : [],
+                                isMultiSelect: false,
+                              ),
                             );
                           } else if (snapshot.hasError) {
-                            return const Text('Error fetching officers data');
+                            return const Text('Error fetching users data');
                           } else {
-                            return const CircularProgressIndicator();
+                            return const SizedBox(); // Placeholder widget when there is no data or error
                           }
                         },
                       ),
                     ),
+
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                    //   child: FutureBuilder<Map<String, int>>(
+                    //     future: fetchUsersWithIds(filter),
+                    //     builder: (context, snapshot) {
+                    //       if (snapshot.connectionState ==
+                    //           ConnectionState.waiting) {
+                    //         return const CircularProgressIndicator();
+                    //       } else if (snapshot.hasData) {
+                    //         usersIds = snapshot.data;
+                    //         users = usersIds!.keys.toList();
+                    //         return CustomSelect2dot1(
+                    //           avatarInSingleSelect: true,
+                    //           extraInfoInDropdown: false,
+                    //           extraInfoInSingleSelect: false,
+                    //           title: 'Select',
+                    //           scrollController: ScrollController(),
+                    //           data: [stdsCategory!],
+                    //           isMultiSelect: false,
+                    //         );
+                    //       } else if (snapshot.hasError) {
+                    //         return const Text('Error fetching users data');
+                    //       } else {
+                    //         return const SizedBox(); // Placeholder widget when there is no data or error
+                    //       }
+                    //     },
+                    //   ),
+                    // ),
+
                     SizedBox(
                       height: 10,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: FutureBuilder<Map<String, int>>(
+                      child: FutureBuilder(
                         future: fetchstdsWithIds("std"),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            stdsIds = snapshot.data;
-                            stds = stdsIds!.keys.toList();
-                            return sector.CustomSingleSelectField<String>(
-                              title: 'Repoted Student',
-                              items: stds!,
-                              onSelectionDone: (value) {
-                                final selectedOfficerId =
-                                    stdsIds![value as String];
-                                setState(() {
-                                  this.selectedstdId = selectedOfficerId;
-                                });
-                              },
-                              itemAsString: (item) => item.toString(),
+                            // stdsIds = snapshot.data;
+                            // stds = stdsIds!.keys.toList();
+                            return CustomSelect2dot1(
+                              avatarInSingleSelect: true,
+                              extraInfoInDropdown: true,
+                              isReortedby: false,
+                              extraInfoInSingleSelect: false,
+                              title: 'Select',
+                              scrollController: ScrollController(),
+                              data: stdsCategory == null ? [] : [stdsCategory!],
+                              isMultiSelect: false,
                             );
                           } else if (snapshot.hasError) {
                             return const Text('Error fetching officers data');
@@ -314,7 +418,7 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                       txtColor: txtColor,
                     ),
                     MyTextField(
-                      controller: test2,
+                      controller: des_con,
                       hintText: "Description",
                       obscureText: false,
                       // maxlines: 8,
@@ -346,10 +450,8 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                                     .pickImage(source: ImageSource.gallery);
                                 if (file != null) {
                                   imageFile = File(file.path);
-                                  loggedInUser!.uploadPic(imageFile!);
+                                  //loggedInUser!.uploadPic(imageFile!);
                                 }
-                                Navigator.of(context).pop();
-                                setState(() {});
                               },
                             ),
                           ),
@@ -447,10 +549,32 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                       width: 200,
                       child: ButtonWidget(
                           btnText: "Save",
-                          onPress: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const CommitteeDashboard_Screen()));
+                          onPress: () async {
+                            if (dropDownController!.isReportedbyId != null &&
+                                selectedcomityId != "" &&
+                                dateTime != "" &&
+                                dropDownController!.selectedStudentId != null &&
+                                des_con.text != "") {
+                              Case c = Case();
+                              c.rbId = int.parse(
+                                  dropDownController!.isReportedbyId!.value ??
+                                      '0');
+                              c.stId = int.parse(dropDownController!
+                                      .selectedStudentId!.value ??
+                                  '0');
+                              ;
+                              c.comId = selectedcomityId;
+                              c.des = des_con.text;
+                              //c.img = imageFile!;
+                              c.violDate = dateTime;
+                              await NewCase(imageFile!, c, context);
+
+                              dropDownController!.selectedStudentId = null;
+                              dropDownController!.isReportedbyId = null;
+                            } else {
+                              snackBar(
+                                  context, "Please fill all fields correctly");
+                            }
                           }),
                     )
                   ],

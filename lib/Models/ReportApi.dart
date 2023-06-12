@@ -47,3 +47,34 @@ class User {
     );
   }
 }
+
+// Function to create a new case
+Future<String> createNewCase() async {
+  try {
+    // Replace 'YOUR_API_URL' with the actual API endpoint URL
+    const String apiUrl = 'YOUR_API_URL';
+
+    // Create a new Dio instance
+    final dio = Dio();
+
+    // Send a multipart request with the image file
+    FormData formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile('path_to_image_file'),
+      'st_id': 1, // Replace with the actual value of 'st_id'
+      'description': 'Some description', // Replace with the actual description
+      'violation_date': '2023-06-11', // Replace with the actual violation date
+      'rb_id': 1, // Replace with the actual value of 'rb_id'
+      'com_id': 1, // Replace with the actual value of 'com_id'
+    });
+
+    final response = await dio.post(apiUrl, data: formData);
+
+    if (response.statusCode == 200) {
+      return 'New case created successfully!';
+    } else {
+      return 'Failed to create a new case';
+    }
+  } catch (error) {
+    return 'Error: $error';
+  }
+}

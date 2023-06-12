@@ -199,7 +199,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               ),
               Container(
                 height: 500,
-                child: TableListScreen(),
+                child: UsersListScreen(),
               ),
             ],
           ),

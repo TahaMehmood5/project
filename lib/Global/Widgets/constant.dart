@@ -8,7 +8,7 @@ Color ScfColor = const Color.fromARGB(255, 255, 249, 249);
 Color tbtnColor = Color.fromARGB(255, 117, 221, 114);
 Color greenColor = Colors.green.shade200;
 
-String ip = 'http://192.168.190.204/Dengue_Project_Api/API/serverapi/';
+String ip = 'http://192.168.229.73/Dengue_Project_Api/API/serverapi/';
 String imgpath = 'http://192.168.15.113/appapisection2/Content/Uploads/';
 
 String mapapikey = "AIzaSyDdb1AI9QsduWLWJs-Dx4_MaPL3VO4XPdw";

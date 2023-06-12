@@ -25,7 +25,7 @@ class User {
     image = map["image"];
     user_id = map["u_id"];
   }
-
+}
   // Future<String?> login() async {
   //   String url = '$api/Login?email=$email&password=$password';
   //   Uri uri = Uri.parse(url);
@@ -74,71 +74,70 @@ class User {
   //   return null;
   // }
 
-  Future<String?> uploadPic(File f) async {
-    String url = '$api/UpdateuserImage';
-    Uri uri = Uri.parse(url);
-    var request = http.MultipartRequest('POST', uri);
-    request.fields["u_id"] = user_id.toString();
-    request.fields["c_id"] = selectedCommittee.toString();
+//   Future<String?> uploadPic(File f, Case c) async {
+//     String url = '$api/UpdateuserImage';
+//     Uri uri = Uri.parse(url);
+//     var request = http.MultipartRequest('POST', uri);
+//     request.fields["u_id"] = user_id.toString();
 
-    http.MultipartFile newfile =
-        await http.MultipartFile.fromPath('image', f.path);
-    //loggedInUser!.image = newfile.toString();
-    request.files.add(newfile);
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      //loggedInUser!.image = ;
-      return 'Uploaded';
-    }
-    return null;
-  }
-}
+//     http.MultipartFile newfile =
+//         await http.MultipartFile.fromPath('image', f.path);
+//     //loggedInUser!.image = newfile.toString();
+//     request.files.add(newfile);
+//     var response = await request.send();
+//     if (response.statusCode == 200) {
+//       //loggedInUser!.image = ;
+//       return 'Uploaded';
+//     }
+//     return null;
+//   }
+// }
 
-class Case {
-  int? rb_id, st_id, com_id;
-  String? des, img;
-  DateTime? viol_date;
-  Case();
-  Case.fromMap(Map<String, dynamic> map) {
-    rb_id = map['rb_id'];
-    st_id = map["st_id"];
-    des = map["description"];
-    img = map["image"];
-    viol_date = map["viol_date"];
-    com_id = map["com_id"];
-  }
+// class Case {
+//   int? rb_id, st_id, com_id;
+//   String? des, img;
+//   DateTime? viol_date;
+//   Case();
+//   Case.fromMap(Map<String, dynamic> map) {
+//     rb_id = map['rb_id'];
+//     st_id = map["st_id"];
+//     des = map["description"];
+//     img = map["image"];
+//     viol_date = map["viol_date"];
+//     com_id = map["com_id"];
+//   }
 
-  Map<String, dynamic> tomMap() {
-    return <String, dynamic>{
-      'rb_id': rb_id,
-      'st_id': st_id,
-      'des': des,
-      'img': img,
-      'viol_date': viol_date,
-      'com_id': com_id,
-    };
-  }
+//   Map<String, dynamic> tomMap() {
+//     return <String, dynamic>{
+//       'rb_id': rb_id,
+//       'st_id': st_id,
+//       'des': des,
+//       'img': img,
+//       'viol_date': viol_date,
+//       'com_id': com_id,
+//     };
+//   }
 
-  Future<String?> uploadPic(Case c) async {
-    var formData = FormData.fromMap({
-      'rb_id': c.rb_id,
-      'st_id': c.st_id,
-      'des': c.des,
-      'viol_date': c.viol_date,
-      'com_id': c.com_id,
-      'img': c.img,
-    });
-    String url = "$api/newcase";
-    //var v = jsonEncode(Case.toMap());
-    // post.user = "12";
-    var response = await Dio().post(url,
-        data: formData,
-        options: Options(headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        }));
-  }
-}
+//   Future<String?> uploadPic(Case c) async {
+//     var formData = FormData.fromMap({
+//       'rb_id': c.rb_id,
+//       'st_id': c.st_id,
+//       'des': c.des,
+//       'viol_date': c.viol_date,
+//       'com_id': c.com_id,
+//       'img': c.img,
+//     });
+//     String url = "$api/newcase";
+//     //var v = jsonEncode(Case.toMap());
+//     // post.user = "12";
+//     var response = await Dio().post(url,
+//         data: formData,
+//         options: Options(headers: {
+//           "Content-Type": "application/json",
+//           "Accept": "application/json"
+//         }));
+//   }
+// }
 // class UserReset {
 //   late String email, newpassword;
 

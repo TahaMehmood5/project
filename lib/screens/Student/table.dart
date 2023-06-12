@@ -1,55 +1,46 @@
-export 'package:pluto_grid/pluto_grid.dart';
-
 import 'dart:convert';
 
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
-import 'package:discipline_committee/screens/Student/table.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:discipline_committee/Global/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pluto_grid/pluto_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../Global/constant.dart';
-
-class TableListScreen extends StatefulWidget {
-  const TableListScreen({Key? key}) : super(key: key);
+class UsersListScreen extends StatefulWidget {
+  const UsersListScreen({Key? key}) : super(key: key);
 
   @override
-  State<TableListScreen> createState() => _TableListScreenState();
+  State<UsersListScreen> createState() => _UsersListScreenState();
 }
 
-class _TableListScreenState extends State<TableListScreen> {
+class _UsersListScreenState extends State<UsersListScreen> {
   TextEditingController text = TextEditingController();
   final _rows = <PlutoRow>[];
   final _columns = [
     PlutoColumn(
-      title: 'Case ID',
+      title: 'User ID',
       field: 'user_id',
       type: PlutoColumnType.number(),
     ),
     PlutoColumn(
-      title: 'Reported Student',
+      title: 'Name',
       field: 'name',
       type: PlutoColumnType.text(),
     ),
 
     PlutoColumn(
-      title: 'Arid-No',
+      title: 'Sector',
       field: 'sec_name',
       type: PlutoColumnType.text(),
     ),
     PlutoColumn(
-      title: 'Violation',
+      title: 'Email',
       field: 'email',
       type: PlutoColumnType.text(),
     ),
     PlutoColumn(
-      title: 'Meeting Time',
-      field: 'phone_number',
-      type: PlutoColumnType.text(),
-    ),
-    PlutoColumn(
-      title: 'Committee Member',
+      title: 'Phone Number',
       field: 'phone_number',
       type: PlutoColumnType.text(),
     ),
@@ -64,40 +55,46 @@ class _TableListScreenState extends State<TableListScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchwithsectors();
+    _fetchwithsectors(true);
     // _loadData();
   }
 
-  void _fetchwithsectors() async {
-    //final response = await http.get(Uri.parse('$api/Getofficers'));
-    final response = await http.get(Uri.parse('$api/GetOfficerSectors'));
+  void _fetchwithsectors(bool? ispunished) async {
+    try {
+      //final response = await http.get(Uri.parse('$api/GetUsers'));
+      final response =
+          await http.get(Uri.parse('$api/GetCases?ispunished=$ispunished'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
 
-      final List<PlutoRow> rows = data.map<PlutoRow>((item) {
-        return PlutoRow(
-          cells: {
-            'user_id': PlutoCell(value: item['user_id']),
-            'name': PlutoCell(value: item['name']),
-            'email': PlutoCell(value: item['email']),
-            'phone_number': PlutoCell(value: item['phone_number']),
-            'role': PlutoCell(value: item['role']),
-            'sec_name': PlutoCell(value: item['sector']['sec_name']),
-          },
-        );
-      }).toList();
+        final List<PlutoRow> rows = data.map<PlutoRow>((item) {
+          return PlutoRow(
+            cells: {
+              'user_id': PlutoCell(value: item['user_id']),
+              'name': PlutoCell(value: item['name']),
+              'email': PlutoCell(value: item['email']),
+              'phone_number': PlutoCell(value: item['phone_number']),
+              'role': PlutoCell(value: item['role']),
+              'sec_name': PlutoCell(value: item['sector']['sec_name']),
+            },
+          );
+        }).toList();
 
-      setState(() {
-        _rows.clear();
-        _rows.addAll(rows);
-      });
+        setState(() {
+          _rows.clear();
+          _rows.addAll(rows);
+        });
+      }
+    } catch (e) {
+      //
     }
   }
 
-  void _fetchwithoutSectors() async {
+  void _fetchwithoutSectors(bool ispunished) async {
     //final response = await http.get(Uri.parse('$api/Getofficers'));
-    final response = await http.get(Uri.parse('$api/Getofficers'));
+    final response =
+        await http.get(Uri.parse('$api/GetCases?ispunished=$ispunished'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -125,23 +122,23 @@ class _TableListScreenState extends State<TableListScreen> {
   void _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isAllOfficers = prefs.getBool('IS_ALL') ?? false;
+      _isAllCases = prefs.getBool('IS_ALL') ?? false;
     });
   }
 
   // ignore: non_constant_identifier_names
-  void _getofficers(bool value, context) async {
+  void _getUsers(bool value, context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('IS_ALL', value);
     if (value == true) {
-      _fetchwithsectors();
+      _fetchwithsectors(value);
     } else {
-      _fetchwithoutSectors();
+      _fetchwithoutSectors(value);
     }
   }
 
   late final PlutoGridStateManager stateManager;
-  bool _isAllOfficers = false;
+  bool _isAllCases = false;
   @override
   Widget build(BuildContext context) {
     //final key = GlobalObjectKey<ExpandableFabState>(context);
@@ -168,7 +165,7 @@ class _TableListScreenState extends State<TableListScreen> {
             //   ),
             // ],
             title: TextWidget(
-                title: "All Health Officers", txtSize: 20, txtColor: txtColor),
+                title: "All Health Users", txtSize: 20, txtColor: txtColor),
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -179,40 +176,38 @@ class _TableListScreenState extends State<TableListScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //   children: [
-                  //     TextWidget(
-                  //         title: "All Officers",
-                  //         txtSize: 15,
-                  //         txtColor: txtColor),
-                  //     Switch.adaptive(
-                  //       inactiveTrackColor:
-                  //           const Color.fromARGB(255, 255, 255, 255),
-                  //       inactiveThumbColor:
-                  //           const Color.fromARGB(255, 246, 195, 195),
-                  //       //enableFeedback: true,
-                  //       activeColor: btnColor,
-                  //       value: _isAllOfficers,
-                  //       onChanged: (value) {
-                  //         setState(
-                  //           () {
-                  //             _isAllOfficers = value;
-                  //             _getofficers(value, context);
-                  //           },
-                  //         );
-                  //       },
-                  //     ),
-                  //     TextWidget(
-                  //         title: "Officers with Sectorss",
-                  //         txtSize: 15,
-                  //         txtColor: txtColor),
-                  //   ],
-                  // ),
-                  // const SizedBox(
-                  //   height: 15,
-                  // ),
-                  // const OfficersScreen(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextWidget(
+                          title: "All Users", txtSize: 15, txtColor: txtColor),
+                      Switch.adaptive(
+                        inactiveTrackColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        inactiveThumbColor:
+                            const Color.fromARGB(255, 246, 195, 195),
+                        //enableFeedback: true,
+                        activeColor: btnColor,
+                        value: _isAllCases,
+                        onChanged: (value) {
+                          setState(
+                            () {
+                              _isAllCases = value;
+                              _getUsers(value, context);
+                            },
+                          );
+                        },
+                      ),
+                      TextWidget(
+                          title: "Users with Sectorss",
+                          txtSize: 15,
+                          txtColor: txtColor),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  // const UsersScreen(),
                   Container(
                     color: ScfColor,
                     height: 600,
@@ -244,68 +239,6 @@ class _TableListScreenState extends State<TableListScreen> {
               ),
             ),
           ),
-          //floatingActionButtonLocation: ExpandableFab.location,
-          // floatingActionButton: ExpandableFab(
-          //   key: key,
-          //   // duration: const Duration(seconds: 1),
-          //   distance: 60.0,
-          //   type: ExpandableFabType.fan,
-          //   // fanAngle: 70,
-          //   //child: const Icon(Icons.account_box),
-          //   foregroundColor: ScfColor,
-          //   backgroundColor: btnColor,
-          //   closeButtonStyle: ExpandableFabCloseButtonStyle(
-          //     //child: Icon(Icons.abc),
-          //     foregroundColor: ScfColor,
-          //     backgroundColor: btnColor,
-          //   ),
-          //   overlayStyle: ExpandableFabOverlayStyle(
-          //     //color: Colors.black.withOpacity(0.5),
-          //     blur: 5,
-          //   ),
-          //   onOpen: () {
-          //     debugPrint('onOpen');
-          //   },
-          //   afterOpen: () {
-          //     debugPrint('afterOpen');
-          //   },
-          //   onClose: () {
-          //     debugPrint('onClose');
-          //   },
-          //   afterClose: () {
-          //     debugPrint('afterClose');
-          //   },
-          //   children: [
-          //     FloatingActionButton.small(
-          //       tooltip: "Edit Officer",
-          //       backgroundColor: btnColor,
-          //       foregroundColor: ScfColor,
-          //       heroTag: null,
-          //       child: const Icon(Icons.edit),
-          //       onPressed: () {
-          //         Navigator.of(context).push(
-          //           MaterialPageRoute(
-          //             builder: ((context) => const Officer_Edit_Screen()),
-          //           ),
-          //         );
-          //       },
-          //     ),
-          //     FloatingActionButton.small(
-          //       tooltip: "Add New Officer",
-          //       backgroundColor: btnColor,
-          //       foregroundColor: ScfColor,
-          //       heroTag: null,
-          //       child: const Icon(Icons.add_box_rounded),
-          //       onPressed: () {
-          //         Navigator.of(context).push(
-          //           MaterialPageRoute(
-          //             builder: ((context) => const OfficerAddScreen()),
-          //           ),
-          //         );
-          //       },
-          //     ),
-          //   ],
-          // ),
         ),
       ),
     );

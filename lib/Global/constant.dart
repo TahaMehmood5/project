@@ -12,13 +12,17 @@ Color greenColor = Colors.green.shade200;
 
 User? loggedInUser;
 
-String ip = "192.168.10.55";
+String ip = "192.168.10.15";
 String api = 'http://$ip/ProjectAPI/api/server';
 String imgpath = 'http://$ip/appapisection2/Content/Uploads/';
 
 String mapapikey = "AIzaSyDdb1AI9QsduWLWJs-Dx4_MaPL3VO4XPdw";
 DateTime? FromDate;
 DateTime? ToDate;
+
+//New Report
+String? selectedCommittee;
+int? selectedcomityId;
 // class Constants {
 //   static const Color primaryColor = Color(0xffFBFBFB);
 //   static const String otpGifImage = "assets/otp.gif";
