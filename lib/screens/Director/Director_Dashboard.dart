@@ -3,11 +3,13 @@ import 'package:discipline_committee/Global/Widgets/button_widget.dart';
 import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/tester.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
-import 'package:discipline_committee/screens/Committe_Member/Report_View.dart';
+import 'package:discipline_committee/screens/Committe_Member/Report_View_Committee.dart';
 import 'package:discipline_committee/screens/Committe_Member/expandable_Datatable.dart';
+import 'package:discipline_committee/screens/Director/AppointHOC.dart';
 import 'package:discipline_committee/screens/HOC/Add_Committee.dart';
 import 'package:discipline_committee/screens/Director/Student_Appeal.dart';
 import 'package:discipline_committee/screens/Student/StudentDashboard.dart';
+import 'package:discipline_committee/screens/Student/table.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -47,7 +49,7 @@ class _DirectorDashboard_ScreenState extends State<DirectorDashboard_Screen> {
                       child: MyContainer(
                         ontap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const ReportView_Screen()));
+                              builder: (context) => ReportView_Screen()));
                         },
                         color: Colors.orange,
                         isSmall: true,
@@ -88,8 +90,7 @@ class _DirectorDashboard_ScreenState extends State<DirectorDashboard_Screen> {
                       child: MyContainer(
                         ontap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  const AddCommittee_Screen()));
+                              builder: (context) => const AppointHoc_Screen()));
                         },
                         color: Colors.red,
                         isSmall: true,
@@ -150,9 +151,7 @@ class _DirectorDashboard_ScreenState extends State<DirectorDashboard_Screen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                    height: 690,
-                    color: btnColor,
-                    child: Expandable_Table_Screen()),
+                    height: 690, color: btnColor, child: UsersListScreen()),
               ),
               SizedBox(
                 height: 30,

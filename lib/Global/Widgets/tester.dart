@@ -22,7 +22,7 @@ getDialogue(context) {
         ),
         Center(
           child: TextWidget(
-            title: "Working",
+            title: "Alert Register 10 student ",
             txtSize: 30,
             txtColor: btnColor,
           ),

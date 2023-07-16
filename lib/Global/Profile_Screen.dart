@@ -191,8 +191,8 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                 iconStyle: IconStyle(
                   backgroundColor: Colors.purple,
                 ),
-                title: 'About',
-                subtitle: "Learn more about us",
+                title: 'Register 10 Students',
+                subtitle: "Cases More than 5",
               ),
               //     SettingsItem(
               //       onTap: () {

@@ -1,11 +1,14 @@
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/constant.dart';
+import 'package:discipline_committee/screens/Committe_Member/Report_View_Committee.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../Global/Widgets/SnackBar_widget.dart';
 
 class UsersListScreen extends StatefulWidget {
   const UsersListScreen({Key? key}) : super(key: key);
@@ -15,33 +18,34 @@ class UsersListScreen extends StatefulWidget {
 }
 
 class _UsersListScreenState extends State<UsersListScreen> {
+  String? dformater;
   TextEditingController text = TextEditingController();
   final _rows = <PlutoRow>[];
   final _columns = [
     PlutoColumn(
-      title: 'User ID',
-      field: 'user_id',
+      title: 'Case No',
+      field: 'case_id',
       type: PlutoColumnType.number(),
     ),
     PlutoColumn(
-      title: 'Name',
+      title: 'Reported student',
       field: 'name',
       type: PlutoColumnType.text(),
     ),
 
     PlutoColumn(
-      title: 'Sector',
-      field: 'sec_name',
+      title: 'Arid_No',
+      field: 'aridno',
       type: PlutoColumnType.text(),
     ),
     PlutoColumn(
-      title: 'Email',
-      field: 'email',
+      title: 'Violation',
+      field: 'title',
       type: PlutoColumnType.text(),
     ),
     PlutoColumn(
-      title: 'Phone Number',
-      field: 'phone_number',
+      title: 'Violaion_Date',
+      field: 'Viol_Date',
       type: PlutoColumnType.text(),
     ),
 
@@ -55,11 +59,11 @@ class _UsersListScreenState extends State<UsersListScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchwithsectors(true);
+    fetchwithPunishment(false);
     // _loadData();
   }
 
-  void _fetchwithsectors(bool? ispunished) async {
+  void fetchwithPunishment(bool? ispunished) async {
     try {
       //final response = await http.get(Uri.parse('$api/GetUsers'));
       final response =
@@ -69,14 +73,18 @@ class _UsersListScreenState extends State<UsersListScreen> {
         final List<dynamic> data = jsonDecode(response.body);
 
         final List<PlutoRow> rows = data.map<PlutoRow>((item) {
+          final dateTime = DateTime.parse(item['viol_date']);
+          final formatter = DateFormat('dd-MM-yyyy');
+          formatter.format(dateTime);
+          item['viol_date'] = dateTime;
           return PlutoRow(
             cells: {
-              'user_id': PlutoCell(value: item['user_id']),
+              'case_id': PlutoCell(value: item['c_id']),
               'name': PlutoCell(value: item['name']),
-              'email': PlutoCell(value: item['email']),
-              'phone_number': PlutoCell(value: item['phone_number']),
-              'role': PlutoCell(value: item['role']),
-              'sec_name': PlutoCell(value: item['sector']['sec_name']),
+              'aridno': PlutoCell(value: item['username']),
+              'title': PlutoCell(value: item['title']),
+              'Viol_Date': PlutoCell(value: item['viol_date']),
+              // 'sec_name': PlutoCell(value: item['sector']['sec_name']),
             },
           );
         }).toList();
@@ -91,7 +99,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
     }
   }
 
-  void _fetchwithoutSectors(bool ispunished) async {
+  void fetchwithoutPunishment(bool ispunished) async {
     //final response = await http.get(Uri.parse('$api/Getofficers'));
     final response =
         await http.get(Uri.parse('$api/GetCases?ispunished=$ispunished'));
@@ -102,12 +110,11 @@ class _UsersListScreenState extends State<UsersListScreen> {
       final List<PlutoRow> rows = data.map<PlutoRow>((item) {
         return PlutoRow(
           cells: {
-            'user_id': PlutoCell(value: item['user_id']),
+            'case_id': PlutoCell(value: item['c_id']),
             'name': PlutoCell(value: item['name']),
-            'email': PlutoCell(value: item['email']),
-            'phone_number': PlutoCell(value: item['phone_number']),
-            'role': PlutoCell(value: item['role']),
-            'sec_name': PlutoCell(value: item['sec_name']),
+            'aridno': PlutoCell(value: item['username']),
+            'title': PlutoCell(value: item['title']),
+            'Viol_Date': PlutoCell(value: item['viol_date']),
           },
         );
       }).toList();
@@ -131,9 +138,9 @@ class _UsersListScreenState extends State<UsersListScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('IS_ALL', value);
     if (value == true) {
-      _fetchwithsectors(value);
+      fetchwithPunishment(value);
     } else {
-      _fetchwithoutSectors(value);
+      fetchwithoutPunishment(value);
     }
   }
 
@@ -150,6 +157,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
           backgroundColor: ScfColor,
           appBar: AppBar(
             backgroundColor: ScfColor,
+            automaticallyImplyLeading: false,
             // actions: [
             //   IconButton(
             //     onPressed: (() {
@@ -165,7 +173,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
             //   ),
             // ],
             title: TextWidget(
-                title: "All Health Users", txtSize: 20, txtColor: txtColor),
+                title: "Student Cases", txtSize: 20, txtColor: txtColor),
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -176,34 +184,34 @@ class _UsersListScreenState extends State<UsersListScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextWidget(
-                          title: "All Users", txtSize: 15, txtColor: txtColor),
-                      Switch.adaptive(
-                        inactiveTrackColor:
-                            const Color.fromARGB(255, 255, 255, 255),
-                        inactiveThumbColor:
-                            const Color.fromARGB(255, 246, 195, 195),
-                        //enableFeedback: true,
-                        activeColor: btnColor,
-                        value: _isAllCases,
-                        onChanged: (value) {
-                          setState(
-                            () {
-                              _isAllCases = value;
-                              _getUsers(value, context);
-                            },
-                          );
-                        },
-                      ),
-                      TextWidget(
-                          title: "Users with Sectorss",
-                          txtSize: 15,
-                          txtColor: txtColor),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //   children: [
+                  //     TextWidget(
+                  //         title: "All Users", txtSize: 15, txtColor: txtColor),
+                  //     Switch.adaptive(
+                  //       inactiveTrackColor:
+                  //           const Color.fromARGB(255, 255, 255, 255),
+                  //       inactiveThumbColor:
+                  //           const Color.fromARGB(255, 246, 195, 195),
+                  //       //enableFeedback: true,
+                  //       activeColor: btnColor,
+                  //       value: _isAllCases,
+                  //       onChanged: (value) {
+                  //         setState(
+                  //           () {
+                  //             _isAllCases = value;
+                  //             _getUsers(value, context);
+                  //           },
+                  //         );
+                  //       },
+                  //     ),
+                  //     TextWidget(
+                  //         title: "Users with Sectorss",
+                  //         txtSize: 15,
+                  //         txtColor: txtColor),
+                  //   ],
+                  // ),
                   const SizedBox(
                     height: 15,
                   ),
@@ -212,6 +220,17 @@ class _UsersListScreenState extends State<UsersListScreen> {
                     color: ScfColor,
                     height: 600,
                     child: PlutoGrid(
+                      onRowDoubleTap: (event) {
+                        final selectedCell = event.cell;
+                        final selectedValue = selectedCell.value ?? '';
+
+                        // Navigate to ClusterMap if a cell is selected
+                        if (selectedValue != null) {
+                          setState(() {
+                            snackBar(context, "Selected Value: $selectedValue");
+                          });
+                        }
+                      },
                       configuration: PlutoGridConfiguration(
                         style: PlutoGridStyleConfig(
                           borderColor: bkColor,

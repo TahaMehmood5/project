@@ -4,7 +4,6 @@ import 'package:discipline_committee/mywidgets/button.dart';
 import 'package:discipline_committee/screens/Admin/NewReport.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../Global/Widgets/textField_widget.dart';
 
 class Admintab extends StatefulWidget {
@@ -115,7 +114,7 @@ class _AdmintabState extends State<Admintab> {
                       trailing: ButtonWidget(
                         btnText: "view",
                         onPress: () {
-                          getDialogue(context);
+                          ;
                         },
                       ), //           <-- subtitle
                     ),

@@ -11,7 +11,7 @@ import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 
 import '../../Global/Widgets/Container_Widget.dart';
 import '../../Global/Widgets/text_widget.dart';
-import '../Committe_Member/Report_View.dart';
+import '../Committe_Member/Report_View_Committee.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -163,7 +163,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                       child: MyContainer(
                         ontap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const ReportView_Screen()));
+                              builder: (context) => ReportView_Screen()));
                         },
                         color: Colors.green,
                         isSmall: true,

@@ -29,7 +29,7 @@ import '../../Global/Widgets/textfield_Round_readonly.dart';
 import '../../Models/usermodel.dart';
 import '../../mywidgets/DropDownController.dart';
 import '../../mywidgets/dropdown_controller.dart';
-import '../Committe_Member/Report_View.dart';
+import '../Committe_Member/Report_View_Committee.dart';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:http/http.dart' as http;
@@ -567,7 +567,11 @@ class _NewReport_ScreenState extends State<NewReport_Screen> {
                               c.des = des_con.text;
                               //c.img = imageFile!;
                               c.violDate = dateTime;
-                              await NewCase(imageFile!, c, context);
+                              register r = register();
+                              r.rtst_id = int.parse(dropDownController!
+                                      .selectedStudentId!.value ??
+                                  '0');
+                              await NewCase(imageFile!, c, r, context);
 
                               dropDownController!.selectedStudentId = null;
                               dropDownController!.isReportedbyId = null;

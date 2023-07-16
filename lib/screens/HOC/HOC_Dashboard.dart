@@ -3,7 +3,7 @@ import 'package:discipline_committee/Global/Widgets/button_widget.dart';
 import 'package:discipline_committee/Global/constant.dart';
 import 'package:discipline_committee/Global/Widgets/tester.dart';
 import 'package:discipline_committee/Global/Widgets/text_widget.dart';
-import 'package:discipline_committee/screens/Committe_Member/Report_View.dart';
+import 'package:discipline_committee/screens/Committe_Member/Report_View_Committee.dart';
 import 'package:discipline_committee/screens/Committe_Member/expandable_Datatable.dart';
 import 'package:discipline_committee/screens/HOC/Add_Committee.dart';
 import 'package:discipline_committee/screens/Director/Student_Appeal.dart';
@@ -46,7 +46,7 @@ class _HOCDashboard_ScreenState extends State<HOCDashboard_Screen> {
                       child: MyContainer(
                         ontap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const ReportView_Screen()));
+                              builder: (context) => ReportView_Screen()));
                         },
                         color: Colors.orange,
                         isSmall: true,

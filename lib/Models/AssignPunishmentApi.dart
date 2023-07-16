@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:discipline_committee/Global/Widgets/SnackBar_widget.dart';
+import 'package:discipline_committee/Global/Widgets/text_widget.dart';
 import 'package:discipline_committee/Global/constant.dart';
+import 'package:flutter/material.dart';
 
 class AssignPunishmentApi {
   int? c_id, f_type, pt_id;
@@ -94,8 +96,25 @@ class Case {
   }
 }
 
+class register {
+  int? rtst_id;
+  register({
+    this.rtst_id,
+  });
+  factory register.fromMap(Map<String, dynamic> map) {
+    return register(
+      rtst_id: map['st_id'],
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'u_id': rtst_id,
+    };
+  }
+}
+
 // Function to upload an image and create a new case
-Future<String?> NewCase(File f, Case c, context) async {
+Future<String?> NewCase(File f, Case c, register r, context) async {
   try {
     // Create a new FormData object
     FormData formData = FormData();
@@ -119,11 +138,17 @@ Future<String?> NewCase(File f, Case c, context) async {
     // Add the 'com_id' field
     formData.fields.add(MapEntry('com_id', c.comId.toString()));
 
+    FormData rData = FormData();
+    formData.fields.add(MapEntry('st_id', r.rtst_id.toString()));
+    final Response = await Dio().post("$api/Registerten", data: rData);
     // Send the request to the API
     final response = await Dio().post("$api/NewCase", data: formData);
 
     if (response.statusCode == 200) {
       snackBar(context, "Case has been Added Succesfully");
+      if (Response.statusCode == 200) {
+        snackBar(context, "Alert Register 10 Student");
+      }
       return 'Uploaded';
     } else {
       return null;

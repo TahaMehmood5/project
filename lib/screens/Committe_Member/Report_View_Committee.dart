@@ -15,7 +15,12 @@ import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:draggable_menu/draggable_menu.dart';
 
 class ReportView_Screen extends StatefulWidget {
-  const ReportView_Screen({super.key});
+  int? uid;
+
+  ReportView_Screen({
+    super.key,
+    this.uid,
+  });
 
   @override
   State<ReportView_Screen> createState() => _ReportView_ScreenState();
@@ -65,7 +70,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
                     width: 50,
                   ),
                   TextWidget(
-                    title: "Taha Mehmood ",
+                    title: "",
                     txtSize: 18,
                     txtColor: txtColor,
                   ),
@@ -86,7 +91,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
                     width: 50,
                   ),
                   TextWidget(
-                    title: "Dr Naseer",
+                    title: "",
                     txtSize: 18,
                     txtColor: txtColor,
                   ),
@@ -107,7 +112,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
                     width: 50,
                   ),
                   TextWidget(
-                    title: "2019-ARID-3106 ",
+                    title: "",
                     txtSize: 18,
                     txtColor: txtColor,
                   ),
@@ -128,7 +133,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
                     width: 50,
                   ),
                   TextWidget(
-                    title: "Fighting",
+                    title: "",
                     txtSize: 18,
                     txtColor: txtColor,
                   ),
@@ -157,7 +162,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Image.asset(
-                          "assets/images.png",
+                          "",
                         ),
                       ),
                     ),
@@ -197,82 +202,87 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
               SizedBox(
                 height: 15,
               ),
-              ButtonWidget(
-                btnText: "Punishment Attendence",
-                onPress: () {
-                  DraggableMenu.open(
-                    context,
-                    DraggableMenu(
-                      // color: ScfColor2,
-                      // uiType: DraggableMenuUiType.softModern,
-                      expandable: true,
-                      fastDrag: true,
-                      minimizeBeforeFastDrag: true,
-                      expandedHeight: MediaQuery.of(context).size.height * 0.72,
-                      maxHeight: MediaQuery.of(context).size.height * 0.36,
-                      child: ScrollableManager(
-                        enableExpandedScroll: true,
-                        child: Scaffold(
-                          body: Padding(
-                            padding: const EdgeInsets.all(18.0),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  HeatMapCalendar(
-                                    datasets: {
-                                      DateTime(2023, 5, 6): 7,
-                                      DateTime(2023, 5, 7): 7,
-                                      DateTime(2023, 5, 8): 1,
-                                      DateTime(2023, 5, 9): 1,
-                                      DateTime(2023, 5, 10): 1,
-                                    },
-                                    colorMode: ColorMode.color,
-                                    textColor: txtColor,
-                                    // showText: false,
-                                    // scrollable: true,
-                                    colorsets: const {
-                                      1: Colors.red,
-                                      7: Colors.green,
-                                      // 3: Colors.orange,
-                                      // 5: Colors.yellow,
+              loggedInUser!.usertype == "adm"
+                  ? ButtonWidget(
+                      btnText: "Punishment Attendence",
+                      onPress: () {
+                        DraggableMenu.open(
+                          context,
+                          DraggableMenu(
+                            // color: ScfColor2,
+                            // uiType: DraggableMenuUiType.softModern,
+                            expandable: true,
+                            fastDrag: true,
+                            minimizeBeforeFastDrag: true,
+                            expandedHeight:
+                                MediaQuery.of(context).size.height * 0.72,
+                            maxHeight:
+                                MediaQuery.of(context).size.height * 0.36,
+                            child: ScrollableManager(
+                              enableExpandedScroll: true,
+                              child: Scaffold(
+                                body: Padding(
+                                  padding: const EdgeInsets.all(18.0),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        HeatMapCalendar(
+                                          datasets: {
+                                            DateTime(2023, 5, 6): 7,
+                                            DateTime(2023, 5, 7): 7,
+                                            DateTime(2023, 5, 8): 1,
+                                            DateTime(2023, 5, 9): 1,
+                                            DateTime(2023, 5, 10): 1,
+                                          },
+                                          colorMode: ColorMode.color,
+                                          textColor: txtColor,
+                                          // showText: false,
+                                          // scrollable: true,
+                                          colorsets: const {
+                                            1: Colors.red,
+                                            7: Colors.green,
+                                            // 3: Colors.orange,
+                                            // 5: Colors.yellow,
 
-                                      // 9: Colors.blue,
-                                      // 11: Colors.indigo,
-                                      // 13: Colors.purple,
-                                    },
-                                    onClick: (value) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            value.toString(),
-                                          ),
+                                            // 9: Colors.blue,
+                                            // 11: Colors.indigo,
+                                            // 13: Colors.purple,
+                                          },
+                                          onClick: (value) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  value.toString(),
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                      );
-                                    },
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        ButtonWidget(
+                                          btnText: "Save",
+                                          onPress: () {},
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  ButtonWidget(
-                                    btnText: "Save",
-                                    onPress: () {},
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    barrier: true,
-                  );
-                },
-              ),
+                          barrier: true,
+                        );
+                      },
+                    )
+                  : SizedBox(),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   vertical: 8.0,
@@ -425,7 +435,7 @@ class _ReportView_ScreenState extends State<ReportView_Screen> {
               Container(
                 width: 200,
                 child: ButtonWidget(
-                    btnText: "Assign Punishmant",
+                    btnText: "Assign Punishment",
                     onPress: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(

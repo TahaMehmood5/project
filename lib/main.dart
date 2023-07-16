@@ -1,7 +1,7 @@
 import 'dart:isolate';
 
 import 'package:discipline_committee/mywidgets/DropDownController.dart';
-import 'package:discipline_committee/screens/Committe_Member/Report_View.dart';
+import 'package:discipline_committee/screens/Committe_Member/Report_View_Committee.dart';
 import 'package:discipline_committee/screens/Committe_Member/Committee_Dashboard.dart';
 import 'package:discipline_committee/screens/LoginScreen.dart';
 import 'package:flutter/material.dart';
